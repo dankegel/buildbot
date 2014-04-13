@@ -24,7 +24,7 @@ class RevlinkMatch(object):
         self.repo_urls = map(re.compile, repo_urls)
         self.revlink = revlink
 
-    def __call__(self, rev, repo):
+    def __call__(self, rev, repo, branch):
         for url in self.repo_urls:
             m = url.match(repo)
             if m:
@@ -67,9 +67,9 @@ class RevlinkMultiplexer(object):
     def __init__(self, *revlinks):
         self.revlinks = revlinks
 
-    def __call__(self, rev, repo):
+    def __call__(self, rev, repo, branch):
         for revlink in self.revlinks:
-            url = revlink(rev, repo)
+            url = revlink(rev, repo, branch)
             if url:
                 return url
 

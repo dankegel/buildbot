@@ -690,12 +690,12 @@ def _revlinkcfg(replace, templates):
         isinstance(replace, str) or isinstance(replace, unicode)
 
     if not replace:
-        return lambda rev, repo: None
+        return lambda rev, repo, branch: None
     else:
         if callable(replace):
-            return lambda rev, repo: replace(rev, repo)
+            return lambda rev, repo, branch: replace(rev, repo, branch)
         elif isinstance(replace, dict):  # TODO: test for [] instead
-            def filter(rev, repo):
+            def filter(rev, repo, branch):
                 url = replace.get(repo)
                 if url:
                     return url % urllib.quote(rev)
@@ -704,7 +704,7 @@ def _revlinkcfg(replace, templates):
 
             return filter
         else:
-            return lambda rev, repo: replace % urllib.quote(rev)
+            return lambda rev, repo, branch: replace % urllib.quote(rev)
 
     assert False, '_replace has a bad type, but we should never get here'
 
@@ -738,13 +738,13 @@ def shortrevfilter(replace, templates):
 
     url_f = _revlinkcfg(replace, templates)
 
-    def filter(rev, repo):
+    def filter(rev, repo, branch):
         if not rev:
             return u''
 
         id_html, short_html = _revlinkmacros(replace, templates)
         rev = unicode(rev)
-        url = url_f(rev, repo)
+        url = url_f(rev, repo, branch)
         rev = jinja2.escape(rev)
         shortrev = rev[:12]  # TODO: customize this depending on vc type
 
@@ -780,12 +780,12 @@ def revlinkfilter(replace, templates):
 
     url_f = _revlinkcfg(replace, templates)
 
-    def filter(rev, repo):
+    def filter(rev, repo, branch):
         if not rev:
             return u''
 
         rev = unicode(rev)
-        url = url_f(rev, repo)
+        url = url_f(rev, repo, branch)
         if url:
             id_html, _ = _revlinkmacros(replace, templates)
             return id_html(rev=rev, url=url)

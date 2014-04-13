@@ -23,7 +23,7 @@
       {%- if ss.project %}{{ ss.project|e }}: {% endif %}
       {%- if ss.codebase %}{{ ss.codebase|e }}: {% endif %}
       {%- if ss.revision -%}
-      {{ ss.revision|shortrev(ss.repository) }}
+      {{ ss.revision|shortrev(ss.repository, ss.branch) }}
       {%- else %}latest{% endif %}
       {%- if ss.branch %} in {{ ss.branch|e }}{% endif %}
       {%- if ss.hasPatch %} [patch]{% endif -%}

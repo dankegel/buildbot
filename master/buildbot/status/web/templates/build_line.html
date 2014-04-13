@@ -3,7 +3,7 @@
   Rev: {% if b.multiple_revs -%}
           multiple rev
        {%- else -%}
-          {{ b.rev_list[0]['rev']|shortrev(b.rev_list[0]['repo']) }}
+          {{ b.rev_list[0]['rev']|shortrev(b.rev_list[0]['repo'], b.rev_list[0]['branch']) }}
        {%- endif %}
   <span class="{{ b.class }}">{{ b.results }}</span>
   {% if include_builder %}
@@ -19,7 +19,7 @@
     <td>{%- for rev in b.rev_list -%}
           {%- if not loop.first %}<br/>{% endif -%}
           {%- if rev.get('codebase', '') %}<span class='codebase'>{{ rev['codebase'] }}</span>:&nbsp;{% endif -%}
-          {{ rev['rev']|shortrev(rev['repo']) }}
+          {{ rev['rev']|shortrev(rev['repo'], rev['branch']) }}
         {%- endfor -%}
     </td>
     <td class="{{ b.class }}">{{ b.results }}</td>

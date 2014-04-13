@@ -46,7 +46,7 @@
     {% endif %}    
     
     {% if b.num_changes < 4 %}
-        {% for c in b.changes %}{{ c.revision|shortrev(c.repo) }}
+        {% for c in b.changes %}{{ c.revision|shortrev(c.repo, c.branch) }}
         (<a href="{{ c.url }}">{{ c.who|email }}</a>){% if not loop.last %},{% endif %}
         {% endfor %}
     {% else %}

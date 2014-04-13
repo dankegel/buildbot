@@ -33,13 +33,13 @@ class RevisionLinks(unittest.TestCase):
         for name in ['shortrev', 'revlink']:
             f = env.filters[name]
             for r in [None, 'repo', 'repo2', 'sub/repo']:
-                self.assertNotSubstring('<a', f(None, r), 'repo: %s' % r)
+                self.assertNotSubstring('<a', f(None, r, 'master'), 'repo: %s' % r)
                 if should_have_links:
-                    self.assertSubstring('<a', f(1234, r), 'repo: %s' % r)
-                    self.assertSubstring('<a', f('deadbeef1234', r), 'repo: %s' % r)
+                    self.assertSubstring('<a', f(1234, r, 'master'), 'repo: %s' % r)
+                    self.assertSubstring('<a', f('deadbeef1234', r, 'master'), 'repo: %s' % r)
                 else:
-                    self.assertNotSubstring('<a', f(1234, r), 'repo: %s' % r)
-                    self.assertNotSubstring('<a', f('deadbeef1234', r), 'repo: %s' % r)
+                    self.assertNotSubstring('<a', f(1234, r, 'master'), 'repo: %s' % r)
+                    self.assertNotSubstring('<a', f('deadbeef1234', r, 'master'), 'repo: %s' % r)
 
     def test_default(self):
         env = wb.createJinjaEnv()
@@ -57,7 +57,7 @@ class RevisionLinks(unittest.TestCase):
         self._test(env)
 
     def test_callable(self):
-        def my_revlink(rev, repo):
+        def my_revlink(rev, repo, branch):
             import urllib
             if not rev:
                 return None
@@ -71,7 +71,7 @@ class RevisionLinks(unittest.TestCase):
         self._test(env)
 
     def test_template(self):
-        template_str = '''{{ rev|revlink('repo') }} - {{ rev|shortrev('repo') }}'''
+        template_str = '''{{ rev|revlink('repo', 'branch') }} - {{ rev|shortrev('repo', 'branch') }}'''
         env = wb.createJinjaEnv(revlink='http://myserver.net/repo/%s')
         template = env.from_string(template_str)
 

@@ -194,7 +194,7 @@ function checkMouseLeave(element, event) {
 
   <tr>
     <td class='DevRev {{ alt }}' width="1%">
-      {{ r.id|shortrev(r.repository) }}
+      {{ r.id|shortrev(r.repository, r.branch) }}
     </td>
     <td class='DevName {{ alt }}' width="1%">
       {{ r.who|user }}

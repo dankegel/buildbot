@@ -34,7 +34,7 @@
   <tr class="{{ row_class.next() }}">
     <td class="left">Revision</td>
     <td>{%- if c.revlink -%}<a href="{{ c.revlink }}">{{ c.rev|e }}</a>
-    {%- else -%}{{ c.rev|revlink(c.repository) }} {%- endif -%}</td>
+    {%- else -%}{{ c.rev|revlink(c.repository, c.branch) }} {%- endif -%}</td>
   </tr>
   {% endif %}
 </table>

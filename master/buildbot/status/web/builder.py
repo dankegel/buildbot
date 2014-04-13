@@ -346,6 +346,7 @@ class StatusResourceBuilder(HtmlResource, BuildLineMixin):
             if source.changes:
                 for c in source.changes:
                     changes.append({'url': path_to_change(req, c),
+                                    #'branch': c.branch,
                                     'who': c.who,
                                     'revision': c.revision,
                                     'repo': c.repository})

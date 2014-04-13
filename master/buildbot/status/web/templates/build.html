@@ -62,11 +62,11 @@ SourceStamps:
     {% endif %}
 
     {% if ss.revision %}
-      <tr class="{{ ss_class.next() }}"><td class="left">Revision</td><td>{{ ss.revision|revlink(ss.repository) }}</td></tr>
+      <tr class="{{ ss_class.next() }}"><td class="left">Revision</td><td>{{ ss.revision|revlink(ss.repository, ss.branch) }}</td></tr>
     {% endif %}
 
     {% if got_revisions[ss.codebase] %}
-      <tr class="{{ ss_class.next() }}"><td class="left">Got Revision</td><td>{{ got_revisions[ss.codebase]|revlink(ss.repository) }}</td></tr>
+      <tr class="{{ ss_class.next() }}"><td class="left">Got Revision</td><td>{{ got_revisions[ss.codebase]|revlink(ss.repository, ss.branch) }}</td></tr>
     {% endif %}
 
     {% if ss.patch %}
