@@ -597,8 +597,9 @@ Buildbot provides two helpers for generating revision links.
 :class:`buildbot.revlinks.RevlinkMatcher` takes a list of regular expressions, and replacement text.
 The regular expressions should all have the same number of capture groups.
 The replacement text should have sed-style references to that capture groups (i.e. '\1' for the first capture group), and a single '%s' reference, for the revision ID.
+As of version TBD, the replacement text may also contain $rev for the revision ID and $branch for the branch name.
 The repository given is tried against each regular expression in turn.
-The results are the substituted into the replacement text, along with the revision ID to obtain the revision link.
+The results are the substituted into the replacement text, along with the revision ID and branch name to obtain the revision link.
 
 ::
 

@@ -14,7 +14,20 @@
 # Copyright Buildbot Team Members
 
 import re
+from string import Template
 
+def _expandRev(s, rev, branch):
+    '''Helper function to do string interpolation of rev and branch into a url'''
+    if not s:
+        return None
+    # Support original % style expansion
+    try:
+        s = s % rev
+    except:
+       pass
+    # Support new $ style expansion
+    s = Template(s).safe_substitute(rev=rev, branch=branch)
+    return s
 
 class RevlinkMatch(object):
 
@@ -28,7 +41,7 @@ class RevlinkMatch(object):
         for url in self.repo_urls:
             m = url.match(repo)
             if m:
-                return m.expand(self.revlink) % rev
+                return _expandRev(m.expand(self.revlink), rev, branch)
 
 GithubRevlink = RevlinkMatch(
     repo_urls=[r'https://github.com/([^/]*)/([^/]*?)(?:\.git)?$',

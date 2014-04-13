@@ -36,6 +36,7 @@ from buildbot.status.results import RETRY
 from buildbot.status.results import SKIPPED
 from buildbot.status.results import SUCCESS
 from buildbot.status.results import WARNINGS
+from string import Template
 from twisted.internet import defer
 from twisted.python import log
 from twisted.web import resource
@@ -515,6 +516,7 @@ class BuildLineMixin:
             return [{
                 'repo': 'unknown, no information in build',
                 'codebase': '',
+                'branch': 'unknown',
                 'rev': 'unknown'
             }]
 
@@ -522,6 +524,7 @@ class BuildLineMixin:
             return [{
                 'repo': ss_list[0].repository,
                 'codebase': ss_list[0].codebase,
+                'branch': ss_list[0].branch,
                 'rev': all_got_revision.get(ss_list[0].codebase, "??")
             }]
 
@@ -539,7 +542,8 @@ class BuildLineMixin:
 
             # show the most descriptive thing we can
             if ss.branch:
-                rev['rev'] = ss.branch
+                rev['rev'] = ss.branch  # ???
+                rev['branch'] = ss.branch
             elif ss.codebase in all_got_revision:
                 rev['rev'] = all_got_revision[ss.codebase]
             elif ss.revision:
@@ -680,6 +684,22 @@ def userfilter(value):
     else:
         return emailfilter(value)  # filter for emails here for safety
 
+def _expandRev(s, rev, branch):
+    '''Helper function to do string interpolation of rev and branch into a url'''
+    # FIXME: Nearly duplicate of one in buildbot/revlinks.py
+    if not s:
+        return None
+    rev = urllib.quote(rev)
+    if branch:
+        branch = urllib.quote(branch)
+    # Support original % style expansion
+    try:
+        s = s % rev
+    except:
+       pass
+    # Support new $ style expansion
+    s = Template(s).safe_substitute(rev=rev, branch=branch)
+    return s
 
 def _revlinkcfg(replace, templates):
     '''Helper function that returns suitable macros and functions
@@ -697,14 +717,10 @@ def _revlinkcfg(replace, templates):
         elif isinstance(replace, dict):  # TODO: test for [] instead
             def filter(rev, repo, branch):
                 url = replace.get(repo)
-                if url:
-                    return url % urllib.quote(rev)
-                else:
-                    return None
-
+                return _expandRev(url, rev, branch)
             return filter
         else:
-            return lambda rev, repo, branch: replace % urllib.quote(rev)
+            return lambda rev, repo, branch: _expandRev(replace, rev, branch)
 
     assert False, '_replace has a bad type, but we should never get here'
 

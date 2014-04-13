@@ -82,6 +82,37 @@ class RevisionLinks(unittest.TestCase):
         self.assertEquals(html.count('<a'), 3)  # one in revlink, two in shortrev
 
 
+class RevisionLinks2(unittest.TestCase):
+
+    """
+    Test webstatus revision link filters using PEP-292-style expansion
+    """
+
+    def setUp(self):
+        pass
+
+    def _test(self, env):
+        for name in ['shortrev', 'revlink']:
+            f = env.filters[name]
+            for r in ['repo', 'repo2', 'sub/repo']:
+                self.assertSubstring('master', f(1234, r, 'master'), 'repo: %s' % r)
+                self.assertSubstring('1234', f(1234, r, 'master'), 'repo: %s' % r)
+                self.assertSubstring('<a', f(1234, r, 'master'), 'repo: %s' % r)
+                self.assertSubstring('deadbeef1234', f('deadbeef1234', r, 'master'), 'repo: %s' % r)
+                self.assertSubstring('<a', f('deadbeef1234', r, 'master'), 'repo: %s' % r)
+
+    def test_format(self):
+        env = wb.createJinjaEnv('http://myserver.net/repo/&branch=$branch?$rev')
+        self._test(env)
+
+    def test_dict(self):
+        env = wb.createJinjaEnv({None: 'http://default.net/repo/$branch/$rev',
+                                 'repo': 'http://myserver.net/repo/$branch/$s',
+                                 'repo2': 'http://myserver2.net/repo/$branch/$rev',
+                                 'sub/repo': 'http://otherserver.com/$branch/$rev'})
+        self._test(env)
+
+
 class ChangeCommentLinks(unittest.TestCase):
 
     """

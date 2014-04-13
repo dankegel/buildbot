@@ -78,6 +78,7 @@ class DevRevision:
         self.revision = change.revision
         self.comments = change.comments
         self.who = change.who
+        self.branch = change.branch
         self.date = change.getTime()
         self.revlink = getattr(change, 'revlink', None)
         self.when = change.when
@@ -546,6 +547,7 @@ class ConsoleStatusResource(HtmlResource):
 
             # Fill the dictionary with this new information
             r['id'] = revision.revision
+            r['branch'] = revision.branch
             r['link'] = revision.revlink
             r['who'] = revision.who
             r['date'] = revision.date
