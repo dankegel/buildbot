@@ -221,7 +221,7 @@ You can restrict which pollers the webhook has access to using the ``allowed`` o
 GitLab hook
 +++++++++++
 
-The GitLab hook is as simple as GitHub one and it also takes no options.
+The GitLab hook is as simple as GitHub one, and can be used without options.
 
 ::
 
@@ -229,8 +229,11 @@ The GitLab hook is as simple as GitHub one and it also takes no options.
         change_hook_dialects={ 'gitlab' : True }
     )
 
-When this is setup you should add a `POST` service pointing to ``/change_hook/gitlab`` relative to the root of the web status.
-For example, it the grid URL is ``http://builds.example.com/bbot/grid``, then point GitLab to ``http://builds.example.com/change_hook/gitlab``.
+
+Then on the Gitlab side, go to Project / Settings / Web Hooks and add a Push Event webhook with a url
+pointing to ``/change_hook/gitlab`` relative to the root of the web status.
+For example, if the grid URL is ``http://builds.example.com/bbot/grid``, then point GitLab to ``http://builds.example.com/change_hook/gitlab``.
+
 The project and/or codebase can also be passed in the URL by appending ``?project=name`` or ``?codebase=foo`` to the URL.
 These parameters will be passed along to the scheduler.
 
@@ -254,6 +257,34 @@ To protect URL against unauthorized access you should use ``change_hook_auth`` o
 Then, create a GitLab service hook (see https://your.gitlab.server/help/web_hooks) with a WebHook URL like ``http://user:password@builds.example.com/bbot/change_hook/gitlab``.
 
 Note that as before, not using ``change_hook_auth`` can expose you to security risks.
+
+If you want gitlab Merge Requests to trigger try builds, set up a :ref:`Try-Schedulers` using Try_Userpass,
+and pass its listening port number and credentials to the gitlab changehook, e.g.
+
+::
+   c['schedulers'] = schedulers.Try_Userpass(name="try2",
+                            builderNames=["full-linux", "full-netbsd", "full-OSX"],
+                            port=8031,
+                            userpass=[("alice","pw1"), ("bob", "pw2")])
+
+    gitlaboptions = { 'tryport' : 8031,
+                      'tryer':'alice', 'tryss':'pw1',
+                      'filter':filterthing,
+                      'gitlabtoken':gitlabtoken,
+                    }
+
+    c['www'] = dict(...,
+        change_hook_dialects={ 'gitlab' : gitlaboptions }
+    )
+
+'gitlabtoken' is a token string obtained from Gitlab manually via Profile / Account / private token;
+it is needed to retrieve the patch from gitlab, and to add comments to the merge request with
+the results of the try builds.
+
+'filter' is an optional key; if given, it is called as
+filterthing.filterBuilderList(builders=builderNames, gitlab_mr_body=merge_request_body)
+where gitlab_mr_body is a dictionary containing the merge request POST body parsed from JSON.
+It returns a list of try builders to build this merge request on.
 
 Gitorious Hook
 ++++++++++++++
