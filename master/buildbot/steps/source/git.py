@@ -502,6 +502,16 @@ class Git(Source, GitMixin):
                 fetch_required = False
 
         if fetch_required:
+            if self.build.hasProperty("target_git_ssh_url"):
+                # Fetch tags from the target repo, else builds
+                # that require up to date tags often fail due to missing tags.
+                # Must precede fetching the branch we want to build,
+                # else we'll build head of this instead.
+                command = ['fetch', '-t', self.build.getProperty("target_git_ssh_url", None)]
+                if self.prog:
+                    command.append('--progress')
+                yield self._dovccmd(command)
+
             command = ['fetch', '-t', self.repourl, self.branch]
             # If the 'progress' option is set, tell git fetch to output
             # progress information to the log. This can solve issues with
@@ -574,6 +584,14 @@ class Git(Source, GitMixin):
             abandonOnFailure = True
         # If it's a shallow clone abort build step
         res = yield self._dovccmd(command, abandonOnFailure=(abandonOnFailure and shallowClone))
+
+        if self.build.hasProperty("target_git_ssh_url"):
+            # Fetch tags from the target repo, else builds
+            # that require up to date tags often fail due to missing tags.
+            command = ['fetch', '-t', self.build.getProperty("target_git_ssh_url", None)]
+            if self.prog:
+                command.append('--progress')
+            yield self._dovccmd(command)
 
         if switchToBranch:
             res = yield self._fetch(None)
